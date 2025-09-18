@@ -58,7 +58,16 @@ class SDocSection(SDocSectionIF):
         self.ng_including_document_reference: Optional[DocumentReference] = None
         self.context = SectionContext()
 
-        self.reserved_mid: MID = MID(mid) if mid is not None else MID.create()
+        deterministic_mid = getattr(self, "deterministic_mid", False)
+        if mid is not None:
+            self.reserved_mid = MID(mid)
+        else:
+            self.reserved_mid = MID.create(
+                deterministic=deterministic_mid,
+                node_uid=self.reserved_uid,
+                node_title=self.reserved_title,
+                node_statement=None,
+            )
         self.mid_permanent: bool = mid is not None
 
         # This is always true, unless the node is filtered out with --filter-requirements.

@@ -176,7 +176,19 @@ class SDocNode(SDocNodeIF):
         )
         if mid_fields is not None:
             mid = mid_fields[0].get_text_value()
-        self.reserved_mid: MID = MID(mid) if mid is not None else MID.create()
+        # Determine if deterministic MID generation is enabled (default False)
+        deterministic_mid = getattr(self, "deterministic_mid", False)
+        if mid is not None:
+            self.reserved_mid = MID(mid)
+        else:
+            self.reserved_mid = MID.create(
+                deterministic=deterministic_mid,
+                node_uid=self.reserved_uid,
+                node_title=self.reserved_title,
+                node_statement=self.reserved_statement
+                if hasattr(self, "reserved_statement")
+                else None,
+            )
         self.mid_permanent: bool = mid is not None
 
         self.ng_resolved_custom_level: Optional[str] = None
